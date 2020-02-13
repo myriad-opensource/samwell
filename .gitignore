@@ -1,0 +1,16 @@
+# PyCharm
+.idea
+
+# Python compiled & optimized files
+*.pyc
+*.pyo
+
+# MyPy Cache directory
+.mypy_cache
+
+# for develop installs
+*.egg-info
+
+# venv set up
+.venv
+dist/

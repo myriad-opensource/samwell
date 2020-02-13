@@ -1,0 +1,38 @@
+name: Python package
+
+on: [push]
+env:
+  POETRY_VERSION: 1.0
+
+
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        PYTHON_VERSION: [3.6.10, 3.7.6, 3.8.2]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{matrix.PYTHON_VERSION}}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{matrix.PYTHON_VERSION}}
+    - name: Install poetry
+      run: |
+        python -m pip install --upgrade pip
+        pip install poetry==${{env.POETRY_VERSION}}
+    - name: Install cython
+      run: |
+        poetry run pip install cython==0.29.15
+    - name: Install deps
+      run: |
+        poetry install
+    - name: Run pytest
+      run: |
+        poetry run python -m pytest --cov=samwell --cov-branch
+    - name: Run lint
+      run: |
+        poetry run flake8 --config=flake8.cfg samwell
+    - name: Run mypy
+      run: |
+        poetry run mypy -p samwell --config=mypy.ini
