@@ -18,9 +18,9 @@ Samwell provides easy utilities for reading/writing BAMs:
 
 ```python
 from samwell import sam
-with sam.writer("my-output-file.bam") as out_bam:
-    with sam.reader("myfile.bam") as in_bam:
-        for read in fp:
+with sam.reader("myfile.bam") as in_bam:
+    with sam.writer("my-output-file.bam", header=in_bam.header) as out_bam:
+        for read in in_bam:
             if read.is_paired:
                 out_bam.write(read)
 ```
@@ -31,13 +31,16 @@ with sam.writer("my-output-file.bam") as out_bam:
 You can use `samwell` to easily realign fastq records as necessary
 
 ```python
+from pathlib import Path
 from samwell import sam
-from samwell import bwa_mem
+from samwell.sam import bwa_mem
+from samwell.sam import clipping
+from samwell.sam.bwa_mem import FastqRecord
 with sam.reader("myfile.bam") as in_bam:
-    with sam.writer("outfile.bam") as out_bam:
-        fastq_gen = (FastqRecord.build(read) for read in in_bam)
-        gen = clip_specific_reads(fastq_gen)
-        out_bam.write(bwa_mem.align(gen))
+    with sam.writer("outfile.bam", header=in_bam.header) as out_bam:
+         fastq_gen = iter(FastqRecord.build(read) for read in in_bam)
+         for read in bwa_mem.align(fastq_gen, Path("genome.fasta")):
+             out_bam.write(read)
 ```
 
 See `samwell.bwa_mem` module for more detail.
