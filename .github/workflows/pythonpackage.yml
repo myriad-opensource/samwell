@@ -17,6 +17,14 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{matrix.PYTHON_VERSION}}
+    - name: Install bwa
+      run: |
+        wget https://github.com/lh3/bwa/releases/download/v0.7.17/bwa-0.7.17.tar.bz2
+        tar -jxvf bwa-0.7.17.tar.bz2
+        cd bwa-0.7.17
+        make -j$(nproc)
+        cd ..
+        echo "::add-path::bwa-0.7.17/bwa"
     - name: Install poetry
       run: |
         python -m pip install --upgrade pip
