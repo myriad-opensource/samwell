@@ -24,7 +24,7 @@ jobs:
         cd bwa-0.7.17
         make -j$(nproc)
         cd ..
-        echo "::add-path::bwa-0.7.17/bwa"
+        echo "::add-path::./bwa-0.7.17/bwa"
     - name: Install poetry
       run: |
         python -m pip install --upgrade pip
