@@ -6,7 +6,11 @@ This module contains utility functions for manipulating DNA sequences.
 
 """
 
-_RC_DICT = dict(A='T', C='G', G='C', T='A', a='t', c='g', g='c', t='a', N='N')
+from typing import Dict
+
+_RC_DICT: Dict[str, str] = (
+    dict(A='T', C='G', G='C', T='A', a='t', c='g', g='c', t='a', N='N')
+)
 
 
 def reverse_complement(bases: str) -> str:
