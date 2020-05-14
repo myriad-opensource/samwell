@@ -10,13 +10,21 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        PYTHON_VERSION: [3.6.10, 3.7.6, 3.8.2]
+        PYTHON_VERSION: [3.6, 3.7, 3.8]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{matrix.PYTHON_VERSION}}
       uses: actions/setup-python@v1
       with:
         python-version: ${{matrix.PYTHON_VERSION}}
+    - name: Install bwa
+      run: |
+        wget https://github.com/lh3/bwa/releases/download/v0.7.17/bwa-0.7.17.tar.bz2
+        tar -jxvf bwa-0.7.17.tar.bz2
+        cd bwa-0.7.17
+        make -j$(nproc)
+        cd ..
+        echo "::add-path::${GITHUB_WORKSPACE}/bwa-0.7.17/"
     - name: Install poetry
       run: |
         python -m pip install --upgrade pip
