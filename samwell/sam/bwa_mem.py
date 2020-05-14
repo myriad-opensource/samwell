@@ -100,6 +100,7 @@ import time
 from pathlib import Path
 from typing import Any
 from typing import Callable
+from typing import ClassVar
 from typing import Dict
 from typing import Generic
 from typing import Iterable
@@ -144,9 +145,7 @@ class FastqRecord:
     needs_alignment: bool = True
     read_number: Optional[int] = None
 
-    _RC_DICT = dict(A='T', C='G', G='C', T='A', a='t', c='g', g='c', t='a', N='N')
-
-    _BASE_QUALITY_OFFSET: int = 33
+    _BASE_QUALITY_OFFSET: ClassVar[int] = 33
 
     @classmethod
     def build(cls,
