@@ -10,6 +10,7 @@ from samwell.itertools import MergingIterator
 def test_peekable_iterator_empty() -> None:
     empty_iter: PeekableIterator[None] = peekable([])
     assert not empty_iter.can_peek()
+    assert empty_iter.maybe_peek() is None, "maybe_peek was not None for empty iterator"
     with pytest.raises(StopIteration):
         empty_iter.peek()
     with pytest.raises(StopIteration):
@@ -21,8 +22,10 @@ def test_peekable_iterator_nonempty() -> None:
     for i in range(10):
         assert nonempty_iter.can_peek()
         assert nonempty_iter.peek() == i
+        assert nonempty_iter.maybe_peek() == i, "maybe_peek value didn't match expectation"
         assert next(nonempty_iter) == i
 
+    assert nonempty_iter.maybe_peek() is None, "maybe_peek was not None for exhausted iterator"
     with pytest.raises(StopIteration):
         nonempty_iter.peek()
     with pytest.raises(StopIteration):
@@ -35,6 +38,7 @@ def test_peekable_with_nones() -> None:
 
     for i in range(len(xs)):
         assert iterator.peek() is xs[i]
+        assert iterator.maybe_peek() is xs[i]
         assert next(iterator) is xs[i]
 
 
