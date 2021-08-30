@@ -84,6 +84,7 @@ The module contains the following methods:
 """
 
 from typing import Any
+from typing import Optional
 from typing import Callable
 from typing import Generic
 from typing import Iterable
@@ -131,6 +132,10 @@ class PeekableIterator(Generic[IterType], Iterator[IterType]):
             return self._peek
         else:
             raise StopIteration
+
+    def maybe_peek(self) -> Optional[IterType]:
+        """Returns the next element without consuming it, or None otherwise."""
+        return self._peek if self.can_peek() else None
 
     def takewhile(self, pred: Callable[[IterType], bool]) -> List[IterType]:
         """Consumes from the iterator while pred is true, and returns the result as a List.
