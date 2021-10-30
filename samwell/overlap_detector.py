@@ -173,7 +173,7 @@ class OverlapDetector:
               The intervals will be returned in ascending genomic order.
         """
         results = self.get_overlaps(interval)
-        return [i for i in results if interval.start >= i.start and interval.end >= i.end]
+        return [i for i in results if interval.start >= i.start and interval.end <= i.end]
 
     def get_enclosed(self, interval: Interval) -> List[Interval]:
         """Returns the set of intervals in this detector that are enclosed by the query
