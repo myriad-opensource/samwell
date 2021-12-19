@@ -33,6 +33,8 @@
 
 Samwell provides elegant utilities for managing biological data.
 
+See: [samwell.readthedocs.io](https://samwell.readthedocs.io/en/latest/)
+
 ## Quickstart
 
 First install samwell:
