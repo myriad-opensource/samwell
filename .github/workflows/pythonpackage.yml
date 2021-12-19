@@ -34,7 +34,7 @@ jobs:
         poetry run pip install cython==0.29.15
     - name: Install deps
       run: |
-        poetry install
+        poetry install --extras docs
     - name: Run pytest
       run: |
         poetry run python -m pytest --cov=samwell --cov-branch
@@ -44,3 +44,10 @@ jobs:
     - name: Run mypy
       run: |
         poetry run mypy -p samwell --config=mypy.ini
+    - name: Run docs
+      shell: bash
+      run: |
+        set -euo pipefail
+        pushd docs
+        poetry run make html
+        popd
