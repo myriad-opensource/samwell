@@ -229,7 +229,7 @@ def _pysam_open(path: SamPath,
         raise TypeError(f"Cannot open '{type(path)}' for {open_type}.")
 
     if file_type is None and not open_for_reading:
-        raise ValueError(f"file_type must be given when writing to a file-like object")
+        raise ValueError("file_type must be given when writing to a file-like object")
 
     # file_type must be set when writing, so if file_type is None, then we must be opening it
     # for reading.  Hence, only set mode in kwargs to pysam when file_type is set and when
