@@ -560,7 +560,7 @@ def set_pair_info(r1: AlignedSegment, r2: AlignedSegment, proper_pair: bool = Tr
     """
     assert not r1.is_unmapped, f"Cannot process unmapped mate {r1.query_name}/1"
     assert not r2.is_unmapped, f"Cannot process unmapped mate {r2.query_name}/2"
-    assert r1.query_name == r2.query_name, f"Attempting to pair reads with different qnames."
+    assert r1.query_name == r2.query_name, "Attempting to pair reads with different qnames."
 
     for r in [r1, r2]:
         r.is_paired = True
