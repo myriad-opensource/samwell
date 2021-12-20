@@ -100,7 +100,7 @@ def test_wholly_contained_target() -> None:
              results=[target_outer, target_inner])
 
 
-def test_get_enclosers() -> None:
+def test_get_enclosing_intervals() -> None:
     a = Interval("1", 1, 250)
     b = Interval("1", 5, 30)
     c = Interval("1", 10, 99)
@@ -110,10 +110,10 @@ def test_get_enclosers() -> None:
     detector = OverlapDetector()
     detector.add_all([a, b, c, d, e])
 
-    assert detector.get_enclosers(Interval("1", 10, 100)) == [a]
-    assert detector.get_enclosers(Interval("1", 15, 20)) == [a, b, c]
-    assert detector.get_enclosers(Interval("1", 18, 19)) == [a, b, c, d, e]
-    assert detector.get_enclosers(Interval("1", 50, 99)) == [a, c]
+    assert detector.get_enclosing_intervals(Interval("1", 10, 100)) == [a]
+    assert detector.get_enclosing_intervals(Interval("1", 15, 20)) == [a, b, c]
+    assert detector.get_enclosing_intervals(Interval("1", 18, 19)) == [a, b, c, d, e]
+    assert detector.get_enclosing_intervals(Interval("1", 50, 99)) == [a, c]
 
 
 def test_get_enclosed() -> None:

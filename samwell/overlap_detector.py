@@ -161,7 +161,7 @@ class OverlapDetector:
             intervals = [i.data for i in tree.overlap(interval.start, interval.end)]
             return sorted(intervals, key=lambda intv: (intv.start, intv.end))
 
-    def get_enclosers(self, interval: Interval) -> List[Interval]:
+    def get_enclosing_intervals(self, interval: Interval) -> List[Interval]:
         """Returns  the set of intervals in this detector that wholly enclose the query interval.
         i.e. query.start >= target.start and query.end <= target.end.
         
