@@ -145,13 +145,18 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Union
-
+from typing import TYPE_CHECKING
 import attr
 import pysam
+import sys
 from pysam import AlignmentFile as SamFile
 from pysam import AlignmentHeader as SamHeader
 from pysam import AlignedSegment
 
+if TYPE_CHECKING or sys.version_info < (3, 8, 0):
+    from typing_extensions import Final
+else:
+    from typing import Final
 
 """The valid base classes for opening a SAM/BAM/CRAM file."""
 SamPath = Union[IO[Any], Path, str]
@@ -176,8 +181,8 @@ class SamFileType(enum.Enum):
     """
 
     def __init__(self, mode: str, ext: str) -> None:
-        self.mode = mode
-        self.ext = ext  # type: ignore
+        self.mode: Final[str] = mode
+        self.ext: Final[str] = ext
 
     SAM = ("", ".sam")
     BAM = ("b", ".bam")
