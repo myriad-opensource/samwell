@@ -46,8 +46,8 @@ from typing import Optional
 
 import attr
 from intervaltree import IntervalTree
-from pybedlite.bed_record import BedStrand
-from pybedlite.bed_source import BedSource
+from pybedlite import BedStrand
+import pybedlite as pybed
 
 
 @attr.s(frozen=True, auto_attribs=True)
@@ -198,7 +198,7 @@ class OverlapDetector:
             An overlap detector for the regions in the BED file.
         """
         detector = OverlapDetector()
-        for region in BedSource(path):
+        for region in pybed.reader(path):
             locatable = Interval(refname=region.chrom,
                                  start=region.start,
                                  end=region.end,
