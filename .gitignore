@@ -14,3 +14,6 @@
 # venv set up
 .venv
 dist/
+
+# Sphinx documentation
+html/_build

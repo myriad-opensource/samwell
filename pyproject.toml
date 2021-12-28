@@ -13,7 +13,7 @@ intervaltree = ">=3.0.2"
 cython = ">=0.29.15"
 pysam = ">=0.15.3"
 pybedlite = ">=0.0.1"
-
+sphinx = {version = "4.3.1", optional = true}
 
 [tool.poetry.dev-dependencies]
 pytest = ">=5.3.5"
@@ -21,6 +21,9 @@ pytest-vcr = ">=1.0.2"
 flake8 = ">=3.7.9"
 mypy = ">=0.761"
 pytest-cov = ">=2.8.1"
+
+[tool.poetry.extras]
+docs = ["sphinx"]
 
 [build-system]
 requires = ["poetry>=0.12"]
