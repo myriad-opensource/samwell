@@ -177,7 +177,7 @@ class SamFileType(enum.Enum):
 
     def __init__(self, mode: str, ext: str) -> None:
         self.mode = mode
-        self.ext = ext
+        self.ext = ext # type: ignore
 
     SAM = ("", ".sam")
     BAM = ("b", ".bam")
