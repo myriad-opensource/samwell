@@ -210,6 +210,16 @@ def test_cigar_element_length_on(character: str,
     assert element.length_on_target == length_on_target
 
 
+@pytest.mark.parametrize("in_cigar,out_cigar", [
+    ("75M", "75M"),
+    ("10M10M", "20M"),
+    ("10M10I10M", "10M10I10M"),
+    ("10S10S10S10S10M", "40S10M")
+])
+def test_cigar_coalesce(in_cigar: str, out_cigar: str) -> None:
+    assert str(Cigar.from_cigarstring(in_cigar).coalesce()) == out_cigar
+
+
 @pytest.mark.parametrize("cigartuples,cigarstring", [
     ([], "*"),  # Empty cigar
     ([(0, 10), (1, 5), (0, 1)], "10M5I1M"),  # A simple example
