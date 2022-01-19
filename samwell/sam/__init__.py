@@ -482,6 +482,22 @@ class Cigar:
         """Returns the length of the alignment on the target sequence."""
         return sum([elem.length_on_target for elem in self.elements])
 
+    def coalesce(self) -> "Cigar":
+        """Returns a copy of the cigar adjacent operators of the same type coalesced into single
+        operators."""
+        new_elements: List[CigarElement] = []
+        element_index: int = 0
+        while element_index < len(self.elements):
+            cur_element: CigarElement = self.elements[element_index]
+            op_length: int = cur_element.length
+            element_index += 1
+            while (element_index < len(self.elements) and
+                    cur_element.operator == self.elements[element_index].operator):
+                op_length += self.elements[element_index].length
+                element_index += 1
+            new_elements.append(CigarElement(operator=cur_element.operator, length=op_length))
+        return Cigar(tuple(new_elements))
+
 
 # The SAM tag to store which tool caused the QC fail flag to be set
 QcFailToolTag = 'qt'
@@ -565,7 +581,9 @@ def set_pair_info(r1: AlignedSegment, r2: AlignedSegment, proper_pair: bool = Tr
     """
     assert not r1.is_unmapped, f"Cannot process unmapped mate {r1.query_name}/1"
     assert not r2.is_unmapped, f"Cannot process unmapped mate {r2.query_name}/2"
-    assert r1.query_name == r2.query_name, "Attempting to pair reads with different qnames."
+    assert r1.query_name == r2.query_name, (
+        f"Attempting to pair reads with different qnames {r1.query_name} vs {r2.query_name}."
+    )
 
     for r in [r1, r2]:
         r.is_paired = True
