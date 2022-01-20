@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "samwell"
-version = "v0.0.2"
+version = "v0.0.3"
 description = "Useful utilities for biological data formats and analyses"
-authors = ["Jeff Tratner <jeffrey.tratner@myriad.com>", "Nils Homer", "Tim Fennell"]
+authors = ["Jeff Tratner <jeffrey.tratner@myriad.com>", "Nils Homer", "Tim Fennell", "Nathan Roach"]
 
 [tool.poetry.dependencies]
 python = ">=3.6"
