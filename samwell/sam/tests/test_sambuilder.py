@@ -2,6 +2,8 @@
 
 import pytest
 
+from pathlib import Path
+from py._path.local import LocalPath as TmpDir
 from samwell import sam
 from samwell.sam.sambuilder import SamBuilder
 
@@ -174,6 +176,51 @@ def test_sorting() -> None:
         assert ref_id > last_ref_id or (ref_id == last_ref_id and start >= last_start)
         last_ref_id = ref_id
         last_start = start
+
+
+def test_arbitrary_sort_options(tmpdir: TmpDir) -> None:
+    builder = SamBuilder()
+    builder.add_pair(
+        name="test3",
+        chrom="chr1",
+        start1=5000,
+        start2=4700,
+        strand1="-",
+        strand2="+"
+    )
+    builder.add_pair(name="test2", chrom="chr1", start1=4000, start2=4300)
+    builder.add_pair(name="test1", chrom="chr5", start1=4000, start2=4300)
+    builder.add_pair(name="test4", chrom="chr2", start1=4000, start2=4300)
+
+    pos_path = Path(str(tmpdir)) / "test_position_order.bam"
+    builder.to_path(pos_path)
+
+    with sam.reader(pos_path) as in_bam:
+        expected_names = ["test2", "test3", "test4", "test1"]
+        for name in expected_names:
+            read1 = next(in_bam)
+            assert name == read1.query_name, (
+                "Position based read sort order did not match expectation"
+            )
+            read2 = next(in_bam)
+            assert name == read2.query_name, (
+                "Position based read sort order did not match expectation"
+            )
+
+    name_path = Path(str(tmpdir)) / "test_name_order.bam"
+    builder.to_path(name_path, index=False, sort_opts=["-n"])
+
+    with sam.reader(name_path) as in_bam:
+        expected_names = ["test1", "test2", "test3", "test4"]
+        for name in expected_names:
+            read1 = next(in_bam)
+            assert name == read1.query_name, (
+                "Query name based read sort order did not match expectation"
+            )
+            read2 = next(in_bam)
+            assert name == read2.query_name, (
+                "Query name based read sort order did not match expectation"
+            )
 
 
 def test_custom_sd() -> None:
