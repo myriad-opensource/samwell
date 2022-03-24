@@ -401,7 +401,8 @@ class SamBuilder:
     def to_path(self,
                 path: Optional[Path] = None,
                 index: bool = True,
-                pred: Callable[[AlignedSegment], bool] = lambda r: True) -> Path:
+                pred: Callable[[AlignedSegment], bool] = lambda r: True,
+                sort_opts: Optional[List[str]] = None) -> Path:
         """Write the accumulated records to a file, sorts & indexes it, and returns the Path.
         If a path is provided, it will be written to, otherwise a temporary file is created
         and returned.
@@ -410,6 +411,7 @@ class SamBuilder:
             path: a path at which to write the file, otherwise a temp file is used.
             index: if True an index is generated, otherwise not.
             pred: optional predicate to specify which reads should be output
+            sort_opts: additional args to pass to samtools sort. E.g. ["-n", "-@", "5"]
 
         Returns:
             Path: The path to the sorted (and possibly indexed) file.
@@ -428,7 +430,9 @@ class SamBuilder:
                     if pred(rec):
                         writer.write(rec)
 
-            pysam.sort("-o", str(path), fp.name)
+            sort_opt_list = ["-o", str(path), fp.name]
+            sort_opt_list = sort_opt_list if sort_opts is None else sort_opts + sort_opt_list
+            pysam.sort(*sort_opt_list)
             if index:
                 pysam.index(str(path))
 
