@@ -20,11 +20,14 @@ from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Tuple
+from typing import Union
+from typing import IO
 
 import pysam
 from pysam import AlignmentHeader, AlignedSegment
 
 from samwell import sam
+from samwell.sam import SamOrder
 
 
 class SamBuilder:
@@ -101,7 +104,8 @@ class SamBuilder:
                  sd: Optional[List[Dict[str, Any]]] = None,
                  rg: Optional[Dict[str, str]] = None,
                  extra_header: Optional[Dict[str, Any]] = None,
-                 seed: int = 42
+                 seed: int = 42,
+                 sort_order: Optional[SamOrder] = SamOrder.Coordinate,
                  ) -> None:
         """Initializes a new SamBuilder for generating alignment records and SAM/BAM files.
 
@@ -120,8 +124,19 @@ class SamBuilder:
         self.r2_len: int = r2_len if r2_len is not None else self.DEFAULT_R2_LENGTH
         self.base_quality: int = base_quality
         self.mapping_quality: int = mapping_quality
+
+        self.sort_order: SamOrder = sort_order
+        if sort_order is None:
+            sort_order_header = "unsorted"
+        elif sort_order == SamOrder.Coordinate:
+            sort_order_header = "coordinate"
+        elif sort_order == SamOrder.QueryName:
+            sort_order_header = "queryname"
+        else:
+            raise ValueError("sort_order provided must be one of Coordinate, QueryName, or None")
+
         self._header: Dict[str, Any] = {
-            "HD": {"VN": "1.5", "SO": "coordinate"},
+            "HD": {"VN": "1.5", "SO": sort_order_header},
             "SQ": (sd if sd is not None else SamBuilder.default_sd()),
             "RG": [(rg if rg is not None else SamBuilder.default_rg())]
         }
@@ -401,17 +416,15 @@ class SamBuilder:
     def to_path(self,
                 path: Optional[Path] = None,
                 index: bool = True,
-                pred: Callable[[AlignedSegment], bool] = lambda r: True,
-                sort_opts: Optional[List[str]] = None) -> Path:
+                pred: Callable[[AlignedSegment], bool] = lambda r: True) -> Path:
         """Write the accumulated records to a file, sorts & indexes it, and returns the Path.
         If a path is provided, it will be written to, otherwise a temporary file is created
         and returned.
 
         Args:
             path: a path at which to write the file, otherwise a temp file is used.
-            index: if True an index is generated, otherwise not.
+            index: if True and sort_order is `Coordinate` index is generated, otherwise not.
             pred: optional predicate to specify which reads should be output
-            sort_opts: additional args to pass to samtools sort. E.g. ["-n", "-@", "5"]
 
         Returns:
             Path: The path to the sorted (and possibly indexed) file.
@@ -422,19 +435,31 @@ class SamBuilder:
                 path = Path(fp.name)
 
         with NamedTemporaryFile(suffix=".bam", delete=True) as fp:
+            file_handle: IO
+            if self.sort_order is None:
+                file_handle = path.open('w')
+            else:
+                file_handle = fp.file
 
-            with sam.writer(fp.file,  # type: ignore
+            with sam.writer(file_handle,  # type: ignore
                             header=self._samheader,
                             file_type=sam.SamFileType.BAM) as writer:
                 for rec in self._records:
                     if pred(rec):
                         writer.write(rec)
 
-            sort_opt_list = ["-o", str(path), fp.name]
-            sort_opt_list = sort_opt_list if sort_opts is None else sort_opts + sort_opt_list
-            pysam.sort(*sort_opt_list)
-            if index:
-                pysam.index(str(path))
+            default_samtools_opt_list = ["-o", str(path), fp.name]
+
+            if self.sort_order == SamOrder.QueryName:
+                pysam.sort(*(["-n"] + default_samtools_opt_list))
+            elif self.sort_order == SamOrder.Coordinate:
+                pysam.sort(*default_samtools_opt_list)
+                if index:
+                    pysam.index(str(path))
+            elif self.sort_order is not None:
+                raise ValueError(
+                    "SamBuilder sort_order must be one of Coordinate, QueryName, or None"
+                )
 
         return path
 

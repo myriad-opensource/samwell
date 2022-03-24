@@ -178,8 +178,8 @@ def test_sorting() -> None:
         last_start = start
 
 
-def test_arbitrary_sort_options(tmpdir: TmpDir) -> None:
-    builder = SamBuilder()
+def test_coordinate_sort_type(tmpdir: TmpDir) -> None:
+    builder = SamBuilder(sort_order=sam.SamOrder.Coordinate)
     builder.add_pair(
         name="test3",
         chrom="chr1",
@@ -207,11 +207,56 @@ def test_arbitrary_sort_options(tmpdir: TmpDir) -> None:
                 "Position based read sort order did not match expectation"
             )
 
+
+def test_query_name_sort_type(tmpdir: TmpDir) -> None:
+    builder = SamBuilder(sort_order=sam.SamOrder.QueryName)
+    builder.add_pair(
+        name="test3",
+        chrom="chr1",
+        start1=5000,
+        start2=4700,
+        strand1="-",
+        strand2="+"
+    )
+    builder.add_pair(name="test2", chrom="chr1", start1=4000, start2=4300)
+    builder.add_pair(name="test1", chrom="chr5", start1=4000, start2=4300)
+    builder.add_pair(name="test4", chrom="chr2", start1=4000, start2=4300)
+
     name_path = Path(str(tmpdir)) / "test_name_order.bam"
-    builder.to_path(name_path, index=False, sort_opts=["-n"])
+    builder.to_path(name_path)
 
     with sam.reader(name_path) as in_bam:
         expected_names = ["test1", "test2", "test3", "test4"]
+        for name in expected_names:
+            read1 = next(in_bam)
+            assert name == read1.query_name, (
+                "Query name based read sort order did not match expectation"
+            )
+            read2 = next(in_bam)
+            assert name == read2.query_name, (
+                "Query name based read sort order did not match expectation"
+            )
+
+
+def test_unsorted_sort_type(tmpdir: TmpDir) -> None:
+    builder = SamBuilder(sort_order=None)
+    builder.add_pair(
+        name="test3",
+        chrom="chr1",
+        start1=5000,
+        start2=4700,
+        strand1="-",
+        strand2="+"
+    )
+    builder.add_pair(name="test2", chrom="chr1", start1=4000, start2=4300)
+    builder.add_pair(name="test1", chrom="chr5", start1=4000, start2=4300)
+    builder.add_pair(name="test4", chrom="chr2", start1=4000, start2=4300)
+
+    unsorted_path = Path(str(tmpdir)) / "test_unsorted.bam"
+    builder.to_path(unsorted_path)
+
+    with sam.reader(unsorted_path) as in_bam:
+        expected_names = ["test3", "test2", "test1", "test4"]
         for name in expected_names:
             read1 = next(in_bam)
             assert name == read1.query_name, (

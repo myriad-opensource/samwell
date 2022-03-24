@@ -604,3 +604,9 @@ def set_pair_info(r1: AlignedSegment, r2: AlignedSegment, proper_pair: bool = Tr
     insert_size = isize(r1, r2)
     r1.template_length = insert_size
     r2.template_length = - insert_size
+
+
+@enum.unique
+class SamOrder(enum.Enum):
+    Coordinate = "Coordinate"
+    QueryName = "QueryName"
