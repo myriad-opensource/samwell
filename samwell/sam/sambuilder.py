@@ -117,6 +117,9 @@ class SamBuilder:
             extra_header: a dictionary of extra values to add to the header, None otherwise.  See
                           `::class::~pysam.AlignmentHeader` for more details.
             seed: a seed value for random number/string generation
+            sort_order: optional sort order, if none reads will be output in the same order as they
+                were appended. If `SamOrder.Coordinate`, reads will be ordered by reference index
+                and coordinate order. If `SamOrder.QueryName`, reads will be ordered by query name.
         """
 
         self.r1_len: int = r1_len if r1_len is not None else self.DEFAULT_R1_LENGTH
