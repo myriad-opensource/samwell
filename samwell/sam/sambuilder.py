@@ -452,7 +452,7 @@ class SamBuilder:
 
             default_samtools_opt_list = ["-o", str(path), fp.name]
 
-            if self.sort_order == None:
+            if self.sort_order is None:
                 file_handle.close()
             elif self.sort_order == SamOrder.QueryName:
                 pysam.sort(*(["-n"] + default_samtools_opt_list))
