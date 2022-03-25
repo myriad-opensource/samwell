@@ -5,7 +5,10 @@ import pytest
 from pathlib import Path
 from py._path.local import LocalPath as TmpDir
 from samwell import sam
+from samwell.sam import SamOrder
 from samwell.sam.sambuilder import SamBuilder
+from typing import Optional
+from typing import List
 
 
 def test_add_pair_all_fields() -> None:
@@ -178,8 +181,8 @@ def test_sorting() -> None:
         last_start = start
 
 
-def test_coordinate_sort_type(tmpdir: TmpDir) -> None:
-    builder = SamBuilder(sort_order=sam.SamOrder.Coordinate)
+def make_sort_order_builder(tmpdir: TmpDir, sort_order: SamOrder) -> Path:
+    builder = SamBuilder(sort_order=sort_order)
     builder.add_pair(
         name="test3",
         chrom="chr1",
@@ -192,12 +195,28 @@ def test_coordinate_sort_type(tmpdir: TmpDir) -> None:
     builder.add_pair(name="test1", chrom="chr5", start1=4000, start2=4300)
     builder.add_pair(name="test4", chrom="chr2", start1=4000, start2=4300)
 
-    pos_path = Path(str(tmpdir)) / "test_position_order.bam"
+    pos_path = Path(str(tmpdir)) / "test.bam"
     builder.to_path(pos_path)
+    return pos_path
 
-    with sam.reader(pos_path) as in_bam:
-        expected_names = ["test2", "test3", "test4", "test1"]
-        for name in expected_names:
+
+@pytest.mark.parametrize(
+    argnames=["sort_order", "expected_name_order"],
+    argvalues=[
+        (SamOrder.Coordinate, ["test2", "test3", "test4", "test1"]),
+        (SamOrder.QueryName, ["test1", "test2", "test3", "test4"]),
+        (None, ["test3", "test2", "test1", "test4"])
+    ],
+    ids=["Coordinate sorting", "Query name sorting", "Unsorted output"]
+)
+def test_sort_types(
+    tmpdir: TmpDir,
+    sort_order: Optional[SamOrder],
+    expected_name_order: List[str]
+) -> None:
+    bam_path = make_sort_order_builder(tmpdir=tmpdir, sort_order=sort_order)
+    with sam.reader(bam_path) as in_bam:
+        for name in expected_name_order:
             read1 = next(in_bam)
             assert name == read1.query_name, (
                 "Position based read sort order did not match expectation"
@@ -205,66 +224,6 @@ def test_coordinate_sort_type(tmpdir: TmpDir) -> None:
             read2 = next(in_bam)
             assert name == read2.query_name, (
                 "Position based read sort order did not match expectation"
-            )
-
-
-def test_query_name_sort_type(tmpdir: TmpDir) -> None:
-    builder = SamBuilder(sort_order=sam.SamOrder.QueryName)
-    builder.add_pair(
-        name="test3",
-        chrom="chr1",
-        start1=5000,
-        start2=4700,
-        strand1="-",
-        strand2="+"
-    )
-    builder.add_pair(name="test2", chrom="chr1", start1=4000, start2=4300)
-    builder.add_pair(name="test1", chrom="chr5", start1=4000, start2=4300)
-    builder.add_pair(name="test4", chrom="chr2", start1=4000, start2=4300)
-
-    name_path = Path(str(tmpdir)) / "test_name_order.bam"
-    builder.to_path(name_path)
-
-    with sam.reader(name_path) as in_bam:
-        expected_names = ["test1", "test2", "test3", "test4"]
-        for name in expected_names:
-            read1 = next(in_bam)
-            assert name == read1.query_name, (
-                "Query name based read sort order did not match expectation"
-            )
-            read2 = next(in_bam)
-            assert name == read2.query_name, (
-                "Query name based read sort order did not match expectation"
-            )
-
-
-def test_unsorted_sort_type(tmpdir: TmpDir) -> None:
-    builder = SamBuilder(sort_order=None)
-    builder.add_pair(
-        name="test3",
-        chrom="chr1",
-        start1=5000,
-        start2=4700,
-        strand1="-",
-        strand2="+"
-    )
-    builder.add_pair(name="test2", chrom="chr1", start1=4000, start2=4300)
-    builder.add_pair(name="test1", chrom="chr5", start1=4000, start2=4300)
-    builder.add_pair(name="test4", chrom="chr2", start1=4000, start2=4300)
-
-    unsorted_path = Path(str(tmpdir)) / "test_unsorted.bam"
-    builder.to_path(unsorted_path)
-
-    with sam.reader(unsorted_path) as in_bam:
-        expected_names = ["test3", "test2", "test1", "test4"]
-        for name in expected_names:
-            read1 = next(in_bam)
-            assert name == read1.query_name, (
-                "Query name based read sort order did not match expectation"
-            )
-            read2 = next(in_bam)
-            assert name == read2.query_name, (
-                "Query name based read sort order did not match expectation"
             )
 
 
