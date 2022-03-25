@@ -452,13 +452,15 @@ class SamBuilder:
 
             default_samtools_opt_list = ["-o", str(path), fp.name]
 
-            if self.sort_order == SamOrder.QueryName:
+            if self.sort_order == None:
+                file_handle.close()
+            elif self.sort_order == SamOrder.QueryName:
                 pysam.sort(*(["-n"] + default_samtools_opt_list))
             elif self.sort_order == SamOrder.Coordinate:
                 pysam.sort(*default_samtools_opt_list)
                 if index:
                     pysam.index(str(path))
-            elif self.sort_order is not None:
+            else:
                 raise ValueError(
                     "SamBuilder sort_order must be one of Coordinate, QueryName, or None"
                 )
