@@ -613,7 +613,7 @@ class SamOrder(enum.Enum):
     Enumerations of possible sort orders for a SAM file.
     """
 
-    Unsorted = "unsorted" #: the SAM / BAM / CRAM is unsorted
+    Unsorted = "unsorted"  #: the SAM / BAM / CRAM is unsorted
     Coordinate = "coordinate"  #: coordinate sorted
     QueryName = "queryname"  #: queryname sorted
-    Unknown = "unknown" # Unknown SAM / BAM / CRAM sort order
+    Unknown = "unknown"  # Unknown SAM / BAM / CRAM sort order
