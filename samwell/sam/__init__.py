@@ -117,6 +117,7 @@ Module Contents
 The module contains the following public classes:
 
     - :class:`~samwell.sam.SamFileType` -- Enumeration of valid SAM/BAM/CRAM file types.
+    - :class:`~samwell.sam.SamOrder` -- Enumeration of possible SAM/BAM/CRAM sort orders.
     - :class:`~samwell.sam.CigarOp` -- Enumeration of operators that can appear in a Cigar string.
     - :class:`~samwell.sam.CigarElement` -- Class representing an element in a Cigar string.
     - :class:`~samwell.sam.CigarParsingException` -- The exception raised specific to parsing a
@@ -608,5 +609,11 @@ def set_pair_info(r1: AlignedSegment, r2: AlignedSegment, proper_pair: bool = Tr
 
 @enum.unique
 class SamOrder(enum.Enum):
-    Coordinate = "Coordinate"
-    QueryName = "QueryName"
+    """
+    Enumerations of possible sort orders for a SAM file.
+    """
+
+    Unsorted = "unsorted" #: the SAM / BAM / CRAM is unsorted
+    Coordinate = "coordinate"  #: coordinate sorted
+    QueryName = "queryname"  #: queryname sorted
+    Unknown = "unknown" # Unknown SAM / BAM / CRAM sort order

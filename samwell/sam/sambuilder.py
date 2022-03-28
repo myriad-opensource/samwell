@@ -17,10 +17,10 @@ from tempfile import NamedTemporaryFile
 from typing import Any
 from typing import Callable
 from typing import Dict
+from typing import IO
 from typing import List
 from typing import Optional
 from typing import Tuple
-from typing import IO
 
 import pysam
 from pysam import AlignmentHeader, AlignedSegment
@@ -117,9 +117,10 @@ class SamBuilder:
             extra_header: a dictionary of extra values to add to the header, None otherwise.  See
                           `::class::~pysam.AlignmentHeader` for more details.
             seed: a seed value for random number/string generation
-            sort_order: optional sort order, if none reads will be output in the same order as they
-                were appended. If `SamOrder.Coordinate`, reads will be ordered by reference index
-                and coordinate order. If `SamOrder.QueryName`, reads will be ordered by query name.
+            sort_order: optional sort order, if `None` reads will be output in the same order as
+                they were appended. If `SamOrder.Coordinate`, reads will be ordered by reference
+                index and coordinate order. If `SamOrder.QueryName`, reads will be ordered by
+                query name.
         """
 
         self.r1_len: int = r1_len if r1_len is not None else self.DEFAULT_R1_LENGTH
@@ -127,18 +128,18 @@ class SamBuilder:
         self.base_quality: int = base_quality
         self.mapping_quality: int = mapping_quality
 
+        sort_order = (
+            SamOrder.Unsorted
+            if sort_order is None or sort_order == SamOrder.Unknown
+            else sort_order
+        )
+        assert sort_order in [SamOrder.Coordinate, SamOrder.QueryName, SamOrder.Unsorted], (
+            "`sort_order` must be one of `Coordinate` `QueryName` or `Unsorted`"
+        )
         self.sort_order: SamOrder = sort_order
-        if sort_order is None:
-            sort_order_header = "unsorted"
-        elif sort_order == SamOrder.Coordinate:
-            sort_order_header = "coordinate"
-        elif sort_order == SamOrder.QueryName:
-            sort_order_header = "queryname"
-        else:
-            raise ValueError("sort_order provided must be one of Coordinate, QueryName, or None")
 
         self._header: Dict[str, Any] = {
-            "HD": {"VN": "1.5", "SO": sort_order_header},
+            "HD": {"VN": "1.5", "SO": sort_order.value},
             "SQ": (sd if sd is not None else SamBuilder.default_sd()),
             "RG": [(rg if rg is not None else SamBuilder.default_rg())]
         }
@@ -425,7 +426,7 @@ class SamBuilder:
 
         Args:
             path: a path at which to write the file, otherwise a temp file is used.
-            index: if True and sort_order is `Coordinate` index is generated, otherwise not.
+            index: if True and `sort_order` is `Coordinate` index is generated, otherwise not.
             pred: optional predicate to specify which reads should be output
 
         Returns:
@@ -438,7 +439,7 @@ class SamBuilder:
 
         with NamedTemporaryFile(suffix=".bam", delete=True) as fp:
             file_handle: IO
-            if self.sort_order is None:
+            if self.sort_order is SamOrder.Unsorted:
                 file_handle = path.open('w')
             else:
                 file_handle = fp.file
@@ -452,7 +453,7 @@ class SamBuilder:
 
             default_samtools_opt_list = ["-o", str(path), fp.name]
 
-            if self.sort_order is None:
+            if self.sort_order is SamOrder.Unsorted:
                 file_handle.close()
             elif self.sort_order == SamOrder.QueryName:
                 pysam.sort(*(["-n"] + default_samtools_opt_list))
@@ -460,11 +461,6 @@ class SamBuilder:
                 pysam.sort(*default_samtools_opt_list)
                 if index:
                     pysam.index(str(path))
-            else:
-                raise ValueError(
-                    "SamBuilder sort_order must be one of Coordinate, QueryName, or None"
-                )
-
         return path
 
     def __len__(self) -> int:
