@@ -130,11 +130,11 @@ class SamBuilder:
 
         sort_order = (
             SamOrder.Unsorted
-            if sort_order is None or sort_order == SamOrder.Unknown
+            if sort_order is None
             else sort_order
         )
         assert sort_order in [SamOrder.Coordinate, SamOrder.QueryName, SamOrder.Unsorted], (
-            "`sort_order` must be one of `Coordinate` `QueryName` or `Unsorted`"
+            "`sort_order for `SamBuilder` must be one of `Coordinate` `QueryName` or `Unsorted`"
         )
         self.sort_order: SamOrder = sort_order
 
@@ -453,9 +453,8 @@ class SamBuilder:
 
             default_samtools_opt_list = ["-o", str(path), fp.name]
 
-            if self.sort_order is SamOrder.Unsorted:
-                file_handle.close()
-            elif self.sort_order == SamOrder.QueryName:
+            file_handle.close()
+            if self.sort_order == SamOrder.QueryName:
                 pysam.sort(*(["-n"] + default_samtools_opt_list))
             elif self.sort_order == SamOrder.Coordinate:
                 pysam.sort(*default_samtools_opt_list)
