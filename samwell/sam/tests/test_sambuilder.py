@@ -205,9 +205,10 @@ def make_sort_order_builder(tmpdir: TmpDir, sort_order: SamOrder) -> Path:
     argvalues=[
         (SamOrder.Coordinate, ["test2", "test3", "test4", "test1"]),
         (SamOrder.QueryName, ["test1", "test2", "test3", "test4"]),
+        (SamOrder.Unsorted, ["test3", "test2", "test1", "test4"]),
         (None, ["test3", "test2", "test1", "test4"])
     ],
-    ids=["Coordinate sorting", "Query name sorting", "Unsorted output"]
+    ids=["Coordinate sorting", "Query name sorting", "Unsorted output", "Unsorted output - None"]
 )
 def test_sort_types(
     tmpdir: TmpDir,
