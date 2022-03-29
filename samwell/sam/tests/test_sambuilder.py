@@ -2,8 +2,13 @@
 
 import pytest
 
+from pathlib import Path
+from py._path.local import LocalPath as TmpDir
 from samwell import sam
+from samwell.sam import SamOrder
 from samwell.sam.sambuilder import SamBuilder
+from typing import Optional
+from typing import List
 
 
 def test_add_pair_all_fields() -> None:
@@ -174,6 +179,53 @@ def test_sorting() -> None:
         assert ref_id > last_ref_id or (ref_id == last_ref_id and start >= last_start)
         last_ref_id = ref_id
         last_start = start
+
+
+def make_sort_order_builder(tmpdir: TmpDir, sort_order: SamOrder) -> Path:
+    builder = SamBuilder(sort_order=sort_order)
+    builder.add_pair(
+        name="test3",
+        chrom="chr1",
+        start1=5000,
+        start2=4700,
+        strand1="-",
+        strand2="+"
+    )
+    builder.add_pair(name="test2", chrom="chr1", start1=4000, start2=4300)
+    builder.add_pair(name="test1", chrom="chr5", start1=4000, start2=4300)
+    builder.add_pair(name="test4", chrom="chr2", start1=4000, start2=4300)
+
+    pos_path = Path(str(tmpdir)) / "test.bam"
+    builder.to_path(pos_path)
+    return pos_path
+
+
+@pytest.mark.parametrize(
+    argnames=["sort_order", "expected_name_order"],
+    argvalues=[
+        (SamOrder.Coordinate, ["test2", "test3", "test4", "test1"]),
+        (SamOrder.QueryName, ["test1", "test2", "test3", "test4"]),
+        (SamOrder.Unsorted, ["test3", "test2", "test1", "test4"]),
+        (None, ["test3", "test2", "test1", "test4"])
+    ],
+    ids=["Coordinate sorting", "Query name sorting", "Unsorted output", "Unsorted output - None"]
+)
+def test_sort_types(
+    tmpdir: TmpDir,
+    sort_order: Optional[SamOrder],
+    expected_name_order: List[str]
+) -> None:
+    bam_path = make_sort_order_builder(tmpdir=tmpdir, sort_order=sort_order)
+    with sam.reader(bam_path) as in_bam:
+        for name in expected_name_order:
+            read1 = next(in_bam)
+            assert name == read1.query_name, (
+                "Position based read sort order did not match expectation"
+            )
+            read2 = next(in_bam)
+            assert name == read2.query_name, (
+                "Position based read sort order did not match expectation"
+            )
 
 
 def test_custom_sd() -> None:
