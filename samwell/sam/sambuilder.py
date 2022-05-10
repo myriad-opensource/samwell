@@ -30,7 +30,7 @@ from samwell.sam import SamOrder
 
 
 class SamBuilder:
-    """Builder for constructing one or more sam records (AlignmentSegments in pysam terms).
+    """Builder for constructing one or more sam records (`AlignmentSegment`s in pysam terms).
 
     Provides the ability to manufacture records from minimal arguments, while generating
     any remaining attributes to ensure a valid record.
@@ -42,8 +42,16 @@ class SamBuilder:
     Once accumulated the records can be accessed in the order in which they were created through
     the :func:`~samwell.sambuilder.SamBuilder.to_unsorted_list` function, or in a list sorted
     by coordinate order via :func:`~samwell.sambuilder.SamBuilder.to_sorted_list`.  The latter
-    creates a temporary file to do the sorting and is somewhat slower as a result.  Lastly, the
-    records can be written to a temporary file using
+    creates a temporary file to do the sorting and is somewhat slower as a result. 
+    
+    Records can be further modified after being returned from 
+    :func:`~samwell.sambuilder.SamBuilder.add_pair`, 
+    :func:`~samwell.sambuilder.SamBuilder.to_unsorted_list`, or 
+    :func:`~samwell.sambuilder.SamBuilder.to_sorted_list` by directly accessing their attributes 
+    through the 
+    [AlignedSegment](https://pysam.readthedocs.io/en/latest/api.html#pysam.AlignedSegment) API.
+    
+    Lastly, the records can be written to a temporary file using 
     :func:`~samwell.sambuilder.SamBuilder.to_path`.
     """
 
@@ -369,6 +377,10 @@ class SamBuilder:
         When synthesizing, bases are always a random sequence of bases, quals are all the default
         base quality (supplied when constructing a SamBuilder) and the cigar is always a single M
         operator of the read length.
+        
+        Alignment attributes not exposed through the method parameters can be modified directly on
+        the returned AlignedSegment objects. Modifications will be reflected when records are 
+        written to a temporary file with :func:`~samwell.sambuilder.SamBuilder.to_path`.
 
         Args:
             name: The name of the template. If None is given a unique name will be auto-generated.
