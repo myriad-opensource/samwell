@@ -431,7 +431,8 @@ class SamBuilder:
     def to_path(self,
                 path: Optional[Path] = None,
                 index: bool = True,
-                pred: Callable[[AlignedSegment], bool] = lambda r: True) -> Path:
+                pred: Callable[[AlignedSegment], bool] = lambda r: True,
+                file_type: sam.SamFileType = sam.SamFileType.BAM) -> Path:
         """Write the accumulated records to a file, sorts & indexes it, and returns the Path.
         If a path is provided, it will be written to, otherwise a temporary file is created
         and returned.
@@ -440,6 +441,7 @@ class SamBuilder:
             path: a path at which to write the file, otherwise a temp file is used.
             index: if True and `sort_order` is `Coordinate` index is generated, otherwise not.
             pred: optional predicate to specify which reads should be output
+            file_type: the file type to output (default is BAM)
 
         Returns:
             Path: The path to the sorted (and possibly indexed) file.
@@ -458,7 +460,7 @@ class SamBuilder:
 
             with sam.writer(file_handle,  # type: ignore
                             header=self._samheader,
-                            file_type=sam.SamFileType.BAM) as writer:
+                            file_type=file_type) as writer:
                 for rec in self._records:
                     if pred(rec):
                         writer.write(rec)
