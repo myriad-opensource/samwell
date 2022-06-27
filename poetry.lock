@@ -125,6 +125,20 @@ pycodestyle = ">=2.8.0,<2.9.0"
 pyflakes = ">=2.4.0,<2.5.0"
 
 [[package]]
+name = "future-annotations"
+version = "1.0.0"
+description = "A backport of __future__ annotations to python<3.7"
+category = "main"
+optional = false
+python-versions = ">=3.6.1"
+
+[package.dependencies]
+tokenize-rt = ">=3"
+
+[package.extras]
+rewrite = ["tokenize-rt (>=3)"]
+
+[[package]]
 name = "idna"
 version = "3.3"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -566,6 +580,14 @@ lint = ["flake8", "mypy", "docutils-stubs"]
 test = ["pytest"]
 
 [[package]]
+name = "tokenize-rt"
+version = "4.2.1"
+description = "A wrapper around the stdlib `tokenize` which roundtrips."
+category = "main"
+optional = false
+python-versions = ">=3.6.1"
+
+[[package]]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
@@ -673,8 +695,8 @@ docs = ["sphinx"]
 
 [metadata]
 lock-version = "1.1"
-python-versions = ">=3.6"
-content-hash = "d3740ebc7169b70e6b5dadeb0d2eb0fd2274621cd96264de0d2dc4d1f33b895d"
+python-versions = ">=3.6.1"
+content-hash = "43e7f76c96c9a685c593e3d1261261746d4c343a424555ce3756ac41aef03439"
 
 [metadata.files]
 alabaster = [
@@ -812,6 +834,10 @@ docutils = [
 flake8 = [
     {file = "flake8-4.0.1-py2.py3-none-any.whl", hash = "sha256:479b1304f72536a55948cb40a32dce8bb0ffe3501e26eaf292c7e60eb5e0428d"},
     {file = "flake8-4.0.1.tar.gz", hash = "sha256:806e034dda44114815e23c16ef92f95c91e4c71100ff52813adf7132a6ad870d"},
+]
+future-annotations = [
+    {file = "future_annotations-1.0.0-py2.py3-none-any.whl", hash = "sha256:a38cc5d9602181a7eb04550d34644508a63e5550c82c4b45b28b86923be203d2"},
+    {file = "future_annotations-1.0.0.tar.gz", hash = "sha256:c707d19f7c74e08d9e67b310fd6a7438ff510ba5cbfb7334695627f8f69c6378"},
 ]
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
@@ -1163,6 +1189,10 @@ sphinxcontrib-qthelp = [
 sphinxcontrib-serializinghtml = [
     {file = "sphinxcontrib-serializinghtml-1.1.5.tar.gz", hash = "sha256:aa5f6de5dfdf809ef505c4895e51ef5c9eac17d0f287933eb49ec495280b6952"},
     {file = "sphinxcontrib_serializinghtml-1.1.5-py2.py3-none-any.whl", hash = "sha256:352a9a00ae864471d3a7ead8d7d79f5fc0b57e8b3f95e9867eb9eb28999b92fd"},
+]
+tokenize-rt = [
+    {file = "tokenize_rt-4.2.1-py2.py3-none-any.whl", hash = "sha256:08a27fa032a81cf45e8858d0ac706004fcd523e8463415ddf1442be38e204ea8"},
+    {file = "tokenize_rt-4.2.1.tar.gz", hash = "sha256:0d4f69026fed520f8a1e0103aa36c406ef4661417f20ca643f913e33531b3b94"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
