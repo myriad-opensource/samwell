@@ -34,6 +34,9 @@ jobs:
     - name: Install cython
       run: |
         poetry run pip install cython==0.29.15
+    - name: Install setuptools-scm for py3.6
+      run: |
+        poetry run pip install setuptools-scm==6.4.2
     - name: Install deps
       run: |
         poetry install --extras docs
