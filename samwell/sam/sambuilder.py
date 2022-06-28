@@ -202,7 +202,7 @@ class SamBuilder:
 
         attrs = attrs if attrs else dict()
         if "RG" not in attrs:
-            attrs["RG"] = self.rg_id()
+            attrs["RG"] = self.rg_id
         rec.set_tags(list(attrs.items()))
         return rec
 
@@ -332,15 +332,17 @@ class SamBuilder:
                         r1.is_proper_pair = True
                         r2.is_proper_pair = True
 
+    @property
     def rg(self) -> Dict[str, Any]:
         """Returns the single read group that is defined in the header."""
         rgs = self._header["RG"]
         assert len(rgs) == 1, "Header did not contain exactly one read group!"
         return rgs[0]
 
+    @property
     def rg_id(self) -> str:
         """Returns the ID of the single read group that is defined in the header."""
-        return self.rg()["ID"]
+        return self.rg["ID"]
 
     def add_pair(self, *,
                  name: Optional[str] = None,
@@ -489,3 +491,8 @@ class SamBuilder:
             path = self.to_path(path=Path(filename), index=False)
             bam = sam.reader(path)
             return list(bam)
+
+    @property
+    def header(self) -> AlignmentHeader:
+        """Returns a copy of the alignmentt header used by this builder"""
+        return AlignmentHeader.from_dict(self._header)
