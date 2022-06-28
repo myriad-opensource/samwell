@@ -341,7 +341,7 @@ class SamBuilder:
     @property
     def rg_id(self) -> str:
         """Returns the ID of the single read group that is defined in the header."""
-        return self.rg()["ID"]
+        return self.rg["ID"]
 
     def add_pair(self, *,
                  name: Optional[str] = None,
