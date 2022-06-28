@@ -245,3 +245,21 @@ def test_custom_rg() -> None:
     builder = SamBuilder(rg={"ID": "novel", "SM": "custom_rg", "LB": "foo", "PL": "ILLUMINA"})
     for rec in builder.add_pair(chrom="chr1", start1=100, start2=200):
         assert rec.get_tag("RG") == "novel"
+
+
+def test_sam_output(tmpdir: TmpDir) -> None:
+    builder = SamBuilder()
+    for _ in range(10):
+        builder.add_pair(chrom="chr1", start1=200, start2=400)
+    out_sam = builder.to_path(file_type=sam.SamFileType.SAM)
+    num_header_lines = 0
+    num_records = 0
+    with out_sam.open("r") as reader:
+        for line in reader:
+            assert len(line) > 0
+            if line.startswith("@"):
+                num_header_lines += 1
+            else:
+                num_records += 1
+    assert num_header_lines > 0
+    assert num_records == 20
