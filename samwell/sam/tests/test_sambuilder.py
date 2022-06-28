@@ -64,8 +64,8 @@ def test_add_pair_minimal() -> None:
     assert len(r2.query_sequence) == len(r2.query_qualities) == 5
     assert r1.cigarstring == "10M"
     assert r2.cigarstring == "5M"
-    assert r1.get_tag("RG") == builder.rg_id()
-    assert r2.get_tag("RG") == builder.rg_id()
+    assert r1.get_tag("RG") == builder.rg_id
+    assert r2.get_tag("RG") == builder.rg_id
 
 
 def test_add_pair_mix_and_match() -> None:

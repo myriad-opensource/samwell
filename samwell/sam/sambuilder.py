@@ -202,7 +202,7 @@ class SamBuilder:
 
         attrs = attrs if attrs else dict()
         if "RG" not in attrs:
-            attrs["RG"] = self.rg_id()
+            attrs["RG"] = self.rg_id
         rec.set_tags(list(attrs.items()))
         return rec
 
