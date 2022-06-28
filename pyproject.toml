@@ -10,7 +10,6 @@ mypy-extensions = ">=0.4.3"
 defopt = ">=5.1.0"
 attrs = ">=19.3.0"
 intervaltree = ">=3.0.2"
-cython = ">=0.29.15"
 pysam = ">=0.15.3"
 pybedlite = ">=0.0.1"
 sphinx = {version = "4.3.1", optional = true}
